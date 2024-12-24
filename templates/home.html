@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Fake News Detection</h1>
+        <p>Enter the content of the news article to predict whether it's real or fake.</p>
+
+        <div class="input-container">
+            <textarea id="newsContent" rows="5" placeholder="Paste the news content here..."></textarea>
+            <button id="predictButton">Predict</button>
+        </div>
+
+        <div id="predictionResult" class="result-container">
+            <p id="predictionText">Prediction will appear here.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('predictButton').addEventListener('click', async function() {
+            const newsContent = document.getElementById('newsContent').value;
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ content: newsContent })
+            });
+
+            const data = await response.json();
+
+            if (data.status === 'success') {
+                document.getElementById('predictionText').textContent = `Prediction: The news is ${data.response}`;
+                document.getElementById('predictionResult').style.backgroundColor = data.response === 'Real News' ? 'lightgreen' : 'lightcoral';
+            } else {
+                document.getElementById('predictionText').textContent = `Error: ${data.response}`;
+                document.getElementById('predictionResult').style.backgroundColor = 'lightgray';
+            }
+        });
+    </script>
+</body>
+</html>
